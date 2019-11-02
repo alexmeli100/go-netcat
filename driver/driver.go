@@ -1,10 +1,10 @@
 package driver
 
 import (
-	"../client"
-	"../config"
-	"../server"
 	"fmt"
+	"github.com/alexmeli100/go-netcat/client"
+	"github.com/alexmeli100/go-netcat/config"
+	"github.com/alexmeli100/go-netcat/server"
 	"log"
 	"net"
 	"os/exec"
@@ -30,7 +30,7 @@ func (d *Driver) run() {
 		log.Fatal("Error creating server")
 	}
 
-	err = s.Run(ServerHandler{})
+	err = s.Run()
 }
 
 type ServerHandler struct {
@@ -42,7 +42,15 @@ func (s ServerHandler) Handle(conn net.Conn) {
 	s.conn = conn
 
 	if s.params.UploadDestination != "" {
-		s.uploadFile(s.params.UploadDestination)
+		err := s.uploadFile(s.params.UploadDestination)
+
+		if err != nil {
+			log.Fatal("Failed to upload file")
+		}
+	}
+
+	if s.params.Execute != "" {
+
 	}
 }
 
