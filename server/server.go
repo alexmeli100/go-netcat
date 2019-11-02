@@ -13,6 +13,7 @@ type Handler interface {
 type TCPServer struct {
 	ch        chan bool
 	conn      net.Listener
+	h         Handler
 	waitGroup *sync.WaitGroup
 }
 
@@ -33,7 +34,11 @@ func NewServer(addr string) (*TCPServer, error) {
 	return s, nil
 }
 
-func (s *TCPServer) Run(h Handler) error {
+func (s *TCPServer) Handle(h Handler) {
+	s.h = h
+}
+
+func (s *TCPServer) Run() error {
 	defer s.waitGroup.Done()
 
 	for {
@@ -51,7 +56,7 @@ func (s *TCPServer) Run(h Handler) error {
 		}
 
 		s.waitGroup.Add(1)
-		go s.serveConn(h, conn)
+		go s.serveConn(s.h, conn)
 	}
 }
 
