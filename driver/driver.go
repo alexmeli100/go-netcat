@@ -24,11 +24,15 @@ func (d *Driver) Run() {
 		peerAddr := fmt.Sprintf("%s:%d", d.Params.Addr, d.Params.Port)
 		c := client.NewClient(peerAddr)
 		c.Run()
+
+		return
 	}
 
 	serverAddr := fmt.Sprintf("%s:%d", d.Params.Addr, d.Params.Port)
 
 	s, err := server.NewServer(serverAddr)
+	handler := ServerHandler{Params: d.Params}
+	s.Handle(handler)
 
 	if err != nil {
 		log.Fatal("Error creating server")
