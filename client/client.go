@@ -28,7 +28,6 @@ func (client *Client) Run() {
 
 	reader := bufio.NewReader(os.Stdin)
 	for {
-		fmt.Print(">> ")
 		text, _ := reader.ReadString('\n')
 		_, err := conn.Write([]byte(text))
 
