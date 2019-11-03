@@ -3,6 +3,7 @@ package client
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"net"
 	"os"
 )
@@ -20,8 +21,7 @@ func (client *Client) Run() {
 	conn, err := net.Dial("tcp", client.peerAddr)
 
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error connecting to server: %v", err)
-		os.Exit(1)
+		log.Fatal("Error connecting to server: ", err)
 	}
 
 	go client.readConnection(conn)
