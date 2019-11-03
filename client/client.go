@@ -3,6 +3,7 @@ package client
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"os"
@@ -40,11 +41,6 @@ func (client *Client) Run() {
 
 func (client *Client) readConnection(conn net.Conn) {
 	defer conn.Close()
-	scanner := bufio.NewScanner(conn)
 
-	for scanner.Scan() {
-		text := scanner.Text()
-
-		fmt.Printf("%s", text)
-	}
+	io.Copy(os.Stdout, conn)
 }
