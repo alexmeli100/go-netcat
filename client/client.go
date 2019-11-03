@@ -20,6 +20,7 @@ func NewClient(peerAddr string) *Client {
 
 func (client *Client) Run() {
 	conn, err := net.Dial("tcp", client.peerAddr)
+	defer conn.Close()
 
 	if err != nil {
 		log.Fatal("Error connecting to server: ", err)
@@ -40,7 +41,5 @@ func (client *Client) Run() {
 }
 
 func (client *Client) readConnection(conn net.Conn) {
-	defer conn.Close()
-
 	io.Copy(os.Stdout, conn)
 }
