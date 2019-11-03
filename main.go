@@ -20,5 +20,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	driver := driver.Driver{Params: &opts}
+	d := driver.Driver{Params: &opts}
+
+	d.Run()
 }
