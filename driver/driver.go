@@ -69,6 +69,7 @@ func (s *ServerHandler) executeShell() {
 	rw := bufio.NewReadWriter(bufio.NewReader(s.conn), bufio.NewWriter(s.conn))
 
 	for {
+		s.conn.Write(prompt)
 		rw.Write(prompt)
 
 		cmd, _ := rw.ReadString('\n')
