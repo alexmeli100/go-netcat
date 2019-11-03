@@ -1,14 +1,18 @@
 package driver
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/alexmeli100/go-netcat/client"
 	"github.com/alexmeli100/go-netcat/config"
 	"github.com/alexmeli100/go-netcat/server"
 	"log"
 	"net"
+	"os"
 	"os/exec"
+	"os/signal"
 	"strings"
+	"syscall"
 )
 
 type Driver struct {
@@ -30,7 +34,11 @@ func (d *Driver) run() {
 		log.Fatal("Error creating server")
 	}
 
-	err = s.Run()
+	ch := make(chan os.Signal)
+	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
+	log.Println(<-ch)
+
+	s.Stop()
 }
 
 type ServerHandler struct {
@@ -41,32 +49,39 @@ type ServerHandler struct {
 func (s ServerHandler) Handle(conn net.Conn) {
 	s.conn = conn
 
-	if s.params.UploadDestination != "" {
-		err := s.uploadFile(s.params.UploadDestination)
-
-		if err != nil {
-			log.Fatal("Failed to upload file")
-		}
+	if s.params.Execute != "" {
+		output, _ := runCommand(s.params.Execute)
+		conn.Write(output)
 	}
 
-	if s.params.Execute != "" {
-
+	if s.params.Command {
+		s.executeShell()
 	}
 }
 
-func (s ServerHandler) runCommand(cmd string) (error, []byte) {
+func (s *ServerHandler) executeShell() {
+	host, _ := os.Hostname()
+	prompt := []byte(fmt.Sprintf("%s>", host))
+	rw := bufio.NewReadWriter(bufio.NewReader(s.conn), bufio.NewWriter(s.conn))
+
+	for {
+		rw.Write(prompt)
+
+		cmd, _ := rw.ReadString('\n')
+		response, _ := runCommand(cmd)
+		rw.Write(response)
+	}
+}
+
+func runCommand(cmd string) ([]byte, error) {
 	cmd = strings.TrimSpace(cmd)
 	shellCmd := exec.Command(cmd)
 
 	out, err := shellCmd.CombinedOutput()
 
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
 
-	return nil, out
-}
-
-func (s ServerHandler) uploadFile(dest string) error {
-
+	return out, nil
 }
