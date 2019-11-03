@@ -1,8 +1,9 @@
 package main
 
 import (
-	"./config"
 	"fmt"
+	"github.com/alexmeli100/go-netcat/config"
+	"github.com/alexmeli100/go-netcat/driver"
 	"github.com/jessevdk/go-flags"
 	"os"
 )
@@ -18,4 +19,6 @@ func main() {
 		fmt.Printf("Failed to parse args: %v\n", err)
 		os.Exit(1)
 	}
+
+	driver := driver.Driver{Params: &opts}
 }

@@ -16,17 +16,17 @@ import (
 )
 
 type Driver struct {
-	params *config.Opts
+	Params *config.Opts
 }
 
-func (d *Driver) run() {
-	if !d.params.Listen {
-		peerAddr := fmt.Sprintf("%s:%d", d.params.Addr, d.params.Port)
+func (d *Driver) Run() {
+	if !d.Params.Listen {
+		peerAddr := fmt.Sprintf("%s:%d", d.Params.Addr, d.Params.Port)
 		c := client.NewClient(peerAddr)
 		c.Run()
 	}
 
-	serverAddr := fmt.Sprintf("%s:%d", d.params.Addr, d.params.Port)
+	serverAddr := fmt.Sprintf("%s:%d", d.Params.Addr, d.Params.Port)
 
 	s, err := server.NewServer(serverAddr)
 
@@ -43,18 +43,18 @@ func (d *Driver) run() {
 
 type ServerHandler struct {
 	conn   net.Conn
-	params *config.Opts
+	Params *config.Opts
 }
 
 func (s ServerHandler) Handle(conn net.Conn) {
 	s.conn = conn
 
-	if s.params.Execute != "" {
-		output, _ := runCommand(s.params.Execute)
+	if s.Params.Execute != "" {
+		output, _ := runCommand(s.Params.Execute)
 		conn.Write(output)
 	}
 
-	if s.params.Command {
+	if s.Params.Command {
 		s.executeShell()
 	}
 }
