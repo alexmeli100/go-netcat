@@ -73,7 +73,7 @@ func (s *ServerHandler) executeShell() {
 
 		cmd, _ := rw.ReadString('\n')
 		response, _ := runCommand(cmd)
-		log.Println(cmd)
+		log.Printf("%s", cmd)
 		log.Printf("%v", response)
 		rw.Write(response)
 	}
