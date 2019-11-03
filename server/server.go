@@ -69,6 +69,8 @@ func (s *TCPServer) Run() {
 			log.Println("Failed to accept connection:", err.Error())
 		}
 
+		log.Println("Received connection from: ", s.conn.Addr())
+
 		s.waitGroup.Add(1)
 		go s.serveConn(s.h, conn)
 	}
