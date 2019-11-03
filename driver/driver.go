@@ -81,7 +81,7 @@ func (s *ServerHandler) executeShell() {
 
 func runCommand(cmd string) ([]byte, error) {
 	cmd = strings.TrimSpace(cmd)
-	shellCmd := exec.Command(cmd)
+	shellCmd := exec.Command("cmd", "/C", cmd)
 
 	out, err := shellCmd.CombinedOutput()
 
