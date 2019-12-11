@@ -6,6 +6,7 @@ import (
 	"github.com/alexmeli100/go-netcat/client"
 	"github.com/alexmeli100/go-netcat/config"
 	"github.com/alexmeli100/go-netcat/server"
+	"io"
 	"log"
 	"net"
 	"os"
@@ -65,18 +66,32 @@ func (s ServerHandler) Handle(conn net.Conn) {
 
 func (s *ServerHandler) executeShell() {
 	host, _ := os.Hostname()
-	prompt := []byte(fmt.Sprintf("%s>", host))
+	prompt := fmt.Sprintf("%s>", host)
 	rw := bufio.NewReadWriter(bufio.NewReader(s.conn), bufio.NewWriter(s.conn))
 
 	for {
-		s.conn.Write(prompt)
-		rw.Write(prompt)
+		_, err := rw.WriteString(prompt)
 
-		cmd, _ := rw.ReadString('\n')
+		if err != nil {
+			break
+		}
+		rw.Flush()
+
+		cmd, err := rw.ReadString('\n')
+
+		if err == io.EOF {
+			break
+		}
+
 		response, _ := runCommand(cmd)
-		log.Printf("%s", cmd)
-		log.Printf("%v", string(response))
-		rw.Write(response)
+		log.Println("loop")
+
+		_, err = rw.Write(response)
+
+		if err != nil {
+			break
+		}
+		rw.Flush()
 	}
 }
 

@@ -80,7 +80,7 @@ func (s *TCPServer) serveConn(h Handler, conn net.Conn) {
 	defer conn.Close()
 	defer s.waitGroup.Done()
 
-	conn.Write([]byte("Reply"))
+	h.Handle(conn)
 }
 
 func (s *TCPServer) close() error {
